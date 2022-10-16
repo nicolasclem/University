@@ -21,11 +21,12 @@ namespace UniversityApiBackend.Helpers
 
             if(userAccounts.UserName == "Admin")
             {
-                claims.Add(new Claim(ClaimTypes.Role, "ADMIN"));
-            }else if (userAccounts.UserName == "User 1")
+                claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+
+            }else if (userAccounts.UserName == "User1")
             {
                 claims.Add(new Claim(ClaimTypes.Role, "User"));
-                claims.Add(new Claim("USerONLY", "User 1"));
+                claims.Add(new Claim("UserOnly", "User1"));
             }
 
             return claims;

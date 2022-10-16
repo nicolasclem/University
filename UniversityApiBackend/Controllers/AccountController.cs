@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
+using UniversityApiBackend.DataAccess;
 using UniversityApiBackend.Helpers;
 using UniversityApiBackend.Models;
 using UniversityApiBackend.Models.DataModels;
@@ -13,12 +14,16 @@ namespace UniversityApiBackend.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly JwtSettings _jwtSetting;
-        public AccountController(JwtSettings jwtSetting)
+        private readonly JwtSettings _jwtSettings;
+        private readonly UniversityDBContext _context;
+        public AccountController(UniversityDBContext context ,JwtSettings jwtSettings )
         {
-            _jwtSetting = jwtSetting;
+            _jwtSettings = jwtSettings;
+            _context = context; 
         }
 
+        // example Users  hardcode
+        //TODO:  Change by real Users in DB
         private IEnumerable<User> Logins = new List<User>()
         {
             new User()
@@ -33,7 +38,7 @@ namespace UniversityApiBackend.Controllers
             {
                 Id=2,
                 Email="nico@test.com",
-                Name="User 1",
+                Name="User1",
                 Password="nico123"
 
             }
@@ -41,16 +46,17 @@ namespace UniversityApiBackend.Controllers
         };
 
         [HttpPost]
-        public IActionResult GetToken(UserLogins userLogins)
+        public IActionResult GetToken(UserLogins userLogin)
         {
             try
             {
                 var Token = new UserTokens();
-                var valid = Logins.Any(user => user.Name.Equals(userLogins.UserName, StringComparison.OrdinalIgnoreCase));
+                
+                var Valid = Logins.Any(user => user.Name.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
 
-                if (valid)
+                if (Valid)
                 {
-                    var user = Logins.FirstOrDefault(user => user.Name.Equals(userLogins.UserName, StringComparison.OrdinalIgnoreCase));
+                    var user = Logins.FirstOrDefault(user => user.Name.Equals(userLogin.UserName, StringComparison.OrdinalIgnoreCase));
 
                     Token = JwtHelpers.GenTokenKey(new UserTokens()
                     {
@@ -60,7 +66,7 @@ namespace UniversityApiBackend.Controllers
                         GuidId=Guid.NewGuid(),
 
 
-                    }, _jwtSetting) ;
+                    }, _jwtSettings) ;
                 }
                 else
                 {

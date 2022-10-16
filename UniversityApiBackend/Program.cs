@@ -1,6 +1,8 @@
 //1. Using  to work entityFramework
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
+using UniversityApiBackend;
 using UniversityApiBackend.DataAccess;
 using UniversityApiBackend.Services;
 
@@ -17,7 +19,7 @@ builder.Services.AddDbContext<UniversityDBContext>(options => options.UseSqlServ
 
 //7. Add Service JWT Autorization
 // TODO:
-//builder.Services.AddJwtTokenServices(builder.Configuration);
+builder.Services.AddJwtTokenServices(builder.Configuration);
 
 
 // Add services to the container.
@@ -31,7 +33,41 @@ builder.Services.AddScoped<IStudentsService, StudentsService>();
 builder.Services.AddEndpointsApiExplorer();
 
 //8 TODO :Config JWT in SWAGGER 
-builder.Services.AddSwaggerGen();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("UserOnlyPolicy", policy => policy.RequireClaim("UserOnly", "User1"));
+});
+builder.Services.AddSwaggerGen(options =>
+{
+    
+    // we define the security for authorization
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name="Authorization",
+        Type=SecuritySchemeType.Http,
+        Scheme= "Bearer",
+        BearerFormat="JWT",
+        In= ParameterLocation.Header,
+        Description="JWT AUTHORIZATION HEADER USING BEARER SCHEME"
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    { 
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                Type=ReferenceType.SecurityScheme,
+                Id="Bearer"
+                }
+            },
+            new string[]{}
+        }
+    });
+
+});
 
 
 //5. CORS configuration
