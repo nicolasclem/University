@@ -206,10 +206,10 @@ namespace linqSnippet
             //all enterprises at least has an employee with more than 1000 of salary
 
             bool hasEmployeeWithSalaryMoreThan1000 =
-                enterprises.Any(enterprise => enterprise.Employees.Any(employe => employe.Salary > 1000))
+                enterprises.Any(enterprise => enterprise.Employees.Any(employe => employe.Salary > 1000));
 
 
-        };
+        }
       
         static public void lingCollections()
         {
@@ -242,8 +242,8 @@ namespace linqSnippet
                                 select new { Element = element };
 
             var leftOuterJoin2 = from element in firstList
-                                 from secondElement in secondList.Where (s => s== element).DefaultIfEmpty()
-                                 select new {Element = element ,SecondElement = secondElement}
+                                 from secondElement in secondList.Where(s => s == element).DefaultIfEmpty()
+                                 select new { Element = element, SecondElement = secondElement };
             //outer join -right
 
             var rightOuterJoin = from secondElement in secondList
@@ -278,6 +278,287 @@ namespace linqSnippet
             var takeLasttwoValues = myList.TakeLast(2);//{9,10}
             var takeWhileSmallerThan4 = myList.TakeWhile(num => num < 4);//{1,2,3,4}
 
+          
+        }
+
+        //paging  skip and take
+        static public IEnumerable<T> GetPage<T>(IEnumerable<T> collection, int pageNumber, int resultPerPage)
+        {
+            int stratIndex = (pageNumber - 1) * resultPerPage;
+            return collection.Skip(stratIndex).Take(resultPerPage);
+        }
+
+        // Variables
+
+        static public void LinqVariables()
+        {
+            int[] numbers = {1, 2, 3, 4, 5, 6,7,8,9, 10};
+
+            var aboveAverage = from number in numbers
+                               let averageNum = numbers.Average()
+                               let nSquared = Math.Pow(number, 2)
+                               where nSquared > averageNum
+                               select number;
+
+            Console.WriteLine("Average:  {0}", numbers.Average());
+            foreach (int number in aboveAverage)
+            {
+                Console.WriteLine("Number : {0} ,Sqaure: {1}",number, Math.Pow(number, 2));
+            }
+        }
+
+        //zip
+        static public void LinqZip()
+        {
+            int[] numbers = { 1, 2, 3, 4, 5 };
+            string[] stringNumbers = { "uno", "dos", "tres", "cuatro", "cinco" };
+
+            IEnumerable<string> zipNumbers = numbers.Zip(stringNumbers,(number,word)=>number+ "="  +word);
+        }
+
+        //repeat  & range
+        static public void repeatRangeLing()
+        {
+            //Generate  collection from 1 -1000----<Range
+            IEnumerable<int> first1000 = Enumerable.Range(1, 1000);
+
+            // Repear a value n times
+            IEnumerable<string> fiveX = Enumerable.Repeat("X", 5);         
+            
+        }
+
+        static public void studentLinq()
+        {
+            var classRoom = new[]
+            {
+                new Student
+                {
+                    Id = 1,
+                    Name="Bauti",
+                    Grade=90,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 2,
+                    Name="Picky",
+                    Grade=50,
+                    Certified=false,
+                },
+                new Student
+                {
+                    Id = 3,
+                    Name="Nico",
+                    Grade=80,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 4,
+                    Name="Pedro",
+                    Grade=35,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 5,
+                    Name="Orco",
+                    Grade=25,
+                    Certified=false,
+                }
+            };
+
+            var certifiedStudents = from student in classRoom
+                                    where student.Certified == true
+                                    select student;
+
+            var noCertifiedStudent = from student in classRoom
+                                     where  student.Certified==false
+                                     select student;
+
+            var approvedStudent = from student in certifiedStudents
+                                  where student.Grade >= 50
+                                  select student.Name;
+        }
+        //all
+        static public void ALLLInq()
+        {
+            var numbers = new List<int>() { 1, 2, 3, 4, 5 };
+
+            bool allAreSmallerThan10 = numbers.All(x=>x<10); //true
+
+            bool allAreBiggerOrEqualsThan2 = numbers.All(x=>x>=2);//false
+
+            var emptyList = new List<int>();
+
+            bool allNumbersAreGreaterThan0= numbers.All(x=>x >=0);//TRUE  (busca el valor q no cumple!!!!!!!
+
+
+        }
+
+        //Aggregate
+
+        static public  void aggregateQueries()
+        {
+            int[] numbers = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+
+            //sum all numbers
+            int sum = numbers.Aggregate((prevSum,current)=>prevSum + current);
+
+            string[] words = { "Hello,", "my", "name", "is", "Bauti" };
+
+            string greating = words.Aggregate((prevGreeting, current) => prevGreeting + current);
+        
+        
+        }
+
+        //disctint
+        static public  void distinctValues()
+        {
+            int[] numbers = { 1, 2, 3, 4, 5, 5, 4, 3, 2, 1 };
+            IEnumerable<int> distinctValues = numbers.Distinct();
+
+        }
+        //GroupBy
+        static public void groupByExamples()
+        {
+            List<int> numbers = new List<int> { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+
+            //Obtain only even numbers and generate two groups
+
+            var grouped = numbers.GroupBy(x => x % 2 == 0);
+
+
+            //We will have two group
+            //1 group that desnt fit  the condition (odd numbers)
+            //2 group that fits the condition (even numbers)
+
+            foreach (var item in grouped)
+            {
+                foreach (var value in item)
+                {
+                    Console.WriteLine(value);//1,3,5,7,9........,2,4,6,8(1er odds , then evene)
+                }
+            }
+
+
+            //another example
+
+            var classRoom = new[]
+            {
+                new Student
+                {
+                    Id = 1,
+                    Name="Bauti",
+                    Grade=90,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 2,
+                    Name="Picky",
+                    Grade=50,
+                    Certified=false,
+                },
+                new Student
+                {
+                    Id = 3,
+                    Name="Nico",
+                    Grade=80,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 4,
+                    Name="Pedro",
+                    Grade=35,
+                    Certified=true,
+                },
+                new Student
+                {
+                    Id = 5,
+                    Name="Orco",
+                    Grade=25,
+                    Certified=false,
+                }
+            };
+
+            var certifiedQuery = classRoom.GroupBy(x => x.Certified && x.Grade >= 50);
+
+            //we have 2 groups
+            //1ero  not certifed
+            //2do   certified
+
+            foreach (var group in certifiedQuery)
+            {
+
+                Console.WriteLine("-----------{0}----------", group.Key);
+                foreach (var student in group)
+                {
+                    Console.WriteLine(student.Name);
+                }
+            }
+        } 
+
+        static public void relationsLinq()
+        {
+            List<Post> posts = new List<Post>()
+            {
+                new Post()
+                {
+                    Id=1,
+                    Title="My first post",
+                    Content="My first content",
+                    Created= DateTime.Now,
+                    Comments= new List<Comment>()
+                    {
+                        new Comment()
+                        {
+                            Id=1,
+                            Created=DateTime.Now,
+                            Title="My first comment",
+                            Content="My first content comment"
+                        },
+                        new Comment()
+                        {
+                            Id=2,
+                            Created=DateTime.Now,
+                            Title="My Second comment",
+                            Content="My Second content comment"
+                        }
+                    }
+
+                },
+                 new Post()
+                {
+                    Id=2,
+                    Title="My Second post",
+                    Content="My Secondt content",
+                    Created= DateTime.Now,
+                    Comments= new List<Comment>()
+                    {
+                        new Comment()
+                        {
+                            Id=3,
+                            Created=DateTime.Now,
+                            Title="My first comment del segundo",
+                            Content="My first content comment del segundo"
+                        },
+                        new Comment()
+                        {
+                            Id=4,
+                            Created=DateTime.Now,
+                            Title="My Second comment del segundo",
+                            Content="My Second content comment del segundo"
+                        }
+                    }
+
+                }
+            };
+
+            var commentsContent = posts.SelectMany(
+                post => post.Comments,
+                (post, comment) => new { PostId = post.Id, CommentContent = comment.Content });
 
         }
     }
